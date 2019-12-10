@@ -2,8 +2,11 @@ package org.example.service;
 
 import org.example.database.DatabaseClass;
 import org.example.model.Comment;
+import org.example.model.ErrorMessage;
 import org.example.model.Message;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -19,6 +22,14 @@ public class CommentService {
     }
 
     public Comment getComment(Long messageId, Long commentId) {
+        Message message = messages.get(messageId);
+        ErrorMessage errorMessage = new ErrorMessage("Not found",404, "");
+        if (message == null) {
+            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND).entity(errorMessage).build());
+        }
+        if (message.getComments().get(commentId) == null) {
+            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND).entity(errorMessage).build());
+        }
         return messages.get(messageId).getComments().get(commentId);
     }
 

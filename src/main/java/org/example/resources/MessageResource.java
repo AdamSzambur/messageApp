@@ -1,9 +1,15 @@
 package org.example.resources;
+import org.example.exceptions.DataNotFoundException;
 import org.example.model.Message;
 import org.example.service.MessageService;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Path("/messages")
@@ -30,13 +36,19 @@ public class MessageResource {
     @GET
     @Path("/{id}")
     public Message getMessage(@PathParam("id") Long id) {
-        return messageService.getMessage(id);
+        Message message = messageService.getMessage(id);
+        if (message == null) {
+            throw new DataNotFoundException("Message with id "+ id + " not found");
+        }
+        return message;
     }
 
     @POST
-
-    public Message addMessage(Message message) {
-        return messageService.addMessage(message);
+    public Response addMessage(Message message, @Context UriInfo uriInfo) {
+        Message newMessage = messageService.addMessage(message);
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(String.valueOf(newMessage.getId())).build())
+                .entity(newMessage)
+                .build();
     }
 
     @PUT
@@ -53,7 +65,7 @@ public class MessageResource {
     }
 
 
-    // redirect to comments resource
+    // redirect request to comments resource
     @Path("/{messageId}/comments")
     public CommentResource getCommentResource() {
         return new CommentResource();
