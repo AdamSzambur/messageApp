@@ -3,7 +3,6 @@ import org.example.database.DatabaseClass;
 import org.example.model.Message;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MessageService {
 
@@ -23,12 +22,12 @@ public class MessageService {
 
     public List<Message> getMessagesPaginated(int start, int size) {
         List<Message> list = new ArrayList<>(messages.values());
-        if (start+size > list.size()) return new ArrayList<Message>();
+        if (start+size > list.size()) return new ArrayList<>(messages.values());
         return list.subList(start, start+ size);
     }
 
     public List<Message> getMessages() {
-        return new ArrayList<Message>(messages.values());
+        return new ArrayList<>(messages.values());
     }
 
     public Message getMessage(Long id) {

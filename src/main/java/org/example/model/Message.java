@@ -1,10 +1,10 @@
 package org.example.model;
 
+import javax.json.bind.annotation.JsonbTransient;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @XmlRootElement
 public class Message {
@@ -14,7 +14,7 @@ public class Message {
     private Date created;
     private String author;
     private Map<Long, Comment> comments = new HashMap<>();
-
+    private List<Link> links = new ArrayList<>();
 
     public Message(Long id, String message, String author) {
         this.id = id;
@@ -23,6 +23,14 @@ public class Message {
         this.created = new Date();
     }
     public Message(){
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
     }
 
     public Long getId() {
@@ -57,12 +65,19 @@ public class Message {
         this.author = author;
     }
 
-    @XmlTransient
+    @JsonbTransient
     public Map<Long, Comment> getComments() {
         return comments;
     }
 
     public void setComments(Map<Long, Comment> comments) {
         this.comments = comments;
+    }
+
+    public void addLink(String uri, String ref) {
+        // first we need to check that link ref to rel is not available
+        if (links.stream().filter(l->l.getRel().equals(ref)).count() == 0) {
+            this.links.add(new Link(uri,ref));
+        }
     }
 }
